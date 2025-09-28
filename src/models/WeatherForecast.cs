@@ -1,4 +1,4 @@
-namespace Testing_CRUD;
+namespace Testing_CRUD.src.models;
 
 public class WeatherForecast
 {

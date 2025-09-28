@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Testing_CRUD.core.database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,16 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var MySQLConnectionString = builder.Configuration.GetConnectionString("AppDbConnectionStringMySql");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(MySQLConnectionString, ServerVersion.AutoDetect(MySQLConnectionString))
+);
+
 var app = builder.Build();
+
+// Initialize database
+InitDatabase.StartDatabase();
 
 // Configure the HTTP request pipeline.
 

@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using Testing_CRUD.src.models;
 
-namespace Testing_CRUD.Controllers;
+namespace Testing_CRUD.src.controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
+    private static readonly string[] Summaries =
+    [
         "Freezing",
         "Bracing",
         "Chilly",
@@ -18,18 +19,21 @@ public class WeatherForecastController : ControllerBase
         "Hot",
         "Sweltering",
         "Scorching",
-    };
+    ];
 
     private readonly ILogger<WeatherForecastController> _logger;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
     {
         _logger = logger;
+        Console.WriteLine("WeatherForecastController constructor");
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
+        Console.WriteLine("Testing GetWeatherForecast");
+
         return Enumerable
             .Range(1, 5)
             .Select(index => new WeatherForecast
@@ -37,7 +41,6 @@ public class WeatherForecastController : ControllerBase
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-            })
-            .ToArray();
+            });
     }
 }
