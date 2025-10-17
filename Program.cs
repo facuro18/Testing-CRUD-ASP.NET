@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Testing_CRUD.core.database;
 using Testing_CRUD.core.database.interfaces;
+using Testing_CRUD.middlewares;
 using Testing_CRUD.src.modules.product.repositories;
 using Testing_CRUD.src.modules.product.services;
 
@@ -55,6 +57,22 @@ builder.Services.AddDbContext<TestingCrudMySqlDbContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// app.UseHttpLogging();
+
+// Use custom request logging middleware
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+// Get logger for Program.cs
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+// Log application startup
+logger.LogInformation("Application starting up...");
+logger.LogTrace("Trace message - Application details");
+logger.LogDebug("Debug message - Configuration loaded");
+logger.LogInformation("Info message - Services registered");
+logger.LogWarning("Warning message - Development environment");
+logger.LogError("Error message - This is just a test error log");
+logger.LogCritical("Critical message - This is just a test critical log");
 
 if (app.Environment.IsDevelopment())
 {

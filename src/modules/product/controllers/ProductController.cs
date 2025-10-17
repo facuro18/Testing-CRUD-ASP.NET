@@ -9,10 +9,12 @@ namespace Testing_CRUD.src.modules.product.controllers;
 public class ProductController : ControllerBase
 {
     private readonly IProductService _productService;
+    private readonly ILogger<ProductController> _logger;
 
-    public ProductController(IProductService productService)
+    public ProductController(IProductService productService, ILogger<ProductController> logger)
     {
         _productService = productService;
+        _logger = logger;
     }
 
     [HttpPost]
@@ -21,17 +23,28 @@ public class ProductController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        Console.WriteLine(
-            "CreateProductDto" + System.Text.Json.JsonSerializer.Serialize(createProductDto)
+        _logger.LogDebug(
+            "Creating product with data: {ProductData}",
+            System.Text.Json.JsonSerializer.Serialize(createProductDto)
         );
 
         try
         {
+            _logger.LogDebug(
+                "Calling ProductService.CreateAsync for product: {ProductName}",
+                createProductDto.Name
+            );
             ProductResponseDto product = await _productService.CreateAsync(createProductDto);
+            _logger.LogDebug("Product created successfully with ID: {ProductId}", product.Id);
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
         catch (Exception ex)
         {
+            _logger.LogError(
+                ex,
+                "Error occurred while creating product: {ProductName}",
+                createProductDto.Name
+            );
             return StatusCode(500, $"An error occurred while creating the product: {ex.Message}");
         }
     }
@@ -39,16 +52,26 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProduct(int id)
     {
+        _logger.LogDebug("Retrieving product with ID: {ProductId}", id);
         try
         {
             ProductResponseDto? product = await _productService.GetByIdAsync(id);
             if (product == null)
+            {
+                _logger.LogWarning("Product with ID {ProductId} not found", id);
                 return NotFound($"Product with ID {id} not found");
+            }
 
+            _logger.LogDebug("Product retrieved successfully: {ProductId}", id);
             return Ok(product);
         }
         catch (Exception ex)
         {
+            _logger.LogError(
+                ex,
+                "Error occurred while retrieving product with ID: {ProductId}",
+                id
+            );
             return StatusCode(500, $"An error occurred while retrieving the product: {ex.Message}");
         }
     }
